@@ -34,18 +34,17 @@ resource "azurerm_subnet" "spoke1-workload" {
   address_prefixes     = ["10.1.1.0/24"]
 }
 
-# resource "azurerm_virtual_network_peering" "spoke1-hub-peer" {
-#   name                      = "spoke1-hub-peer"
-#   resource_group_name       = data.azurerm_resource_group.spoke1-vnet-rg.name
-#   virtual_network_name      = azurerm_virtual_network.spoke1-vnet.name
-#   remote_virtual_network_id = azurerm_virtual_network.hub-vnet.id
+resource "azurerm_virtual_network_peering" "spoke1-to-spoke2-peer" {
+  name                      = "spoke1-to-spoke2-peer"
+  resource_group_name       = data.azurerm_resource_group.spoke1-vnet-rg.name
+  virtual_network_name      = azurerm_virtual_network.spoke1-vnet.name
+  remote_virtual_network_id = azurerm_virtual_network.spoke2-vnet.id
 
-#   allow_virtual_network_access = true
-#   allow_forwarded_traffic      = true
-#   allow_gateway_transit        = false
-#   use_remote_gateways          = true
-#   depends_on                   = [azurerm_virtual_network.spoke1-vnet, azurerm_virtual_network.hub-vnet, azurerm_virtual_network_gateway.hub-vnet-gateway]
-# }
+  depends_on = [
+    azurerm_virtual_network.spoke1-vnet,
+    azurerm_virtual_network.spoke2-vnet
+  ]
+}
 
 resource "azurerm_network_interface" "spoke1-nic" {
   name                 = "${local.prefix-spoke1}-nic"
